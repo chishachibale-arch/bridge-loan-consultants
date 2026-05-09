@@ -457,9 +457,7 @@ Complete the form below to submit your request.
 Selected Service: Loan Consultancy
 </div>
 
-<form action="/website/form/crm.lead"
-method="POST"
-enctype="multipart/form-data">
+<form id="leadForm">
 
 <input type="hidden"
 name="csrf_token"
@@ -578,10 +576,6 @@ Submit Request
 
 </button>
 
-<input type="hidden"
-name="redirect"
-value="/thank-you">
-
 </form>
 
 </div>
@@ -628,7 +622,49 @@ document.getElementById('serviceDisplay').innerHTML =
 }
 
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script>
+const supabaseUrl = "https://nnklqfxjlintfuljrlje.supabase.co";
+
+const supabaseKey = "YOUR_REAL_ANON_KEY";
+
+const supabase = window.supabase.createClient(
+  supabaseUrl,
+  supabaseKey
+);
+</script>
+
+document.getElementById("leadForm").addEventListener("submit", async function(e){
+    e.preventDefault();
+    e.stopPropagation();
+
+    const formData = new FormData(this);
+
+    const data = {
+    full_name: formData.get("contact_name"),
+    nrc: formData.get("x_nrc_number"),
+    phone: formData.get("phone"),
+    email: formData.get("email_from"),
+    employer: formData.get("x_occupation"),
+    loan_amount: formData.get("x_income_range"),
+    crb_status: "pending"
+};
+    const { error } = await supabase
+  .from("loan_applications")
+  .insert([formData]);
+
+    if(error){
+        alert("Failed: " + error.message);
+        console.log(error);
+    } else {
+        alert("Success: Lead submitted!");
+this.reset();
+document.getElementById('serviceDisplay').innerHTML =
+"Selected Service: Loan Consultancy";
+    }
+});
+</script>
 </body>
 
 </html>
